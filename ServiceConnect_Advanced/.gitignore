@@ -1,0 +1,7 @@
+target/
+.env
+uploads/*
+!.gitkeep
+.idea/
+.vscode/
+*.iml

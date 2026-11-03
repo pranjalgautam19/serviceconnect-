@@ -1,0 +1,37 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: serviceconnect
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-localRootPass_ChangeThis}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/serviceconnect?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_ROOT_PASSWORD:-localRootPass_ChangeThis}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@serviceconnect.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-ChangeMe123!}
+      UPLOAD_DIR: /app/uploads
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads_data:/app/uploads
+volumes:
+  mysql_data:
+  uploads_data:

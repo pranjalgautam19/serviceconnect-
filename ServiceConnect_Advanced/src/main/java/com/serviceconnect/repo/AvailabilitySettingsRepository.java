@@ -1,0 +1,3 @@
+package com.serviceconnect.repo;
+import com.serviceconnect.model.AvailabilitySettings; import org.springframework.data.jpa.repository.JpaRepository; import org.springframework.data.jpa.repository.Lock; import jakarta.persistence.LockModeType; import org.springframework.data.jpa.repository.Query; import org.springframework.data.repository.query.Param; import java.util.Optional;
+public interface AvailabilitySettingsRepository extends JpaRepository<AvailabilitySettings,Long>{ Optional<AvailabilitySettings> findByProviderId(Long id); @Lock(LockModeType.PESSIMISTIC_WRITE) @Query("select a from AvailabilitySettings a where a.provider.id=:id") Optional<AvailabilitySettings> lockByProviderId(@Param("id") Long id); }
